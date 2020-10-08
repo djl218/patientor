@@ -17,7 +17,7 @@ const App: React.FC = () => {
     const fetchPatientList = async () => {
       try {
         const { data: patientListFromApi } = await axios.get<Patient[]>(
-          `${apiBaseUrl}/patients`
+          `${apiBaseUrl}/api/patients`
         );
         dispatch({ type: "SET_PATIENT_LIST", payload: patientListFromApi });
       } catch (e) {
