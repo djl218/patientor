@@ -10,7 +10,7 @@ import { useRouteMatch } from 'react-router-dom';
 const IndividualPatientPage: React.FC = () => {
   const [{ patients }, dispatch] = useStateValue();
   const match: MatchParams | null = useRouteMatch('/patients/:id');
-  
+
   React.useEffect(() => {
     const fetchPatient = async () => {
       try {
@@ -33,15 +33,15 @@ const IndividualPatientPage: React.FC = () => {
     if (patient!.gender === "male") {
       return (
         <i className="mars icon"></i>
-      )
+      );
     } else if(patient!.gender === "female") {
       return (
         <i className="venus icon"></i>
-      )
+      );
     } else {
       return (
         <i className="genderless icon"></i>
-      )
+      );
     }
   };
 
