@@ -2,25 +2,13 @@ import React from "react";
 import axios from "axios";
 import { Container } from "semantic-ui-react";
 
-import { Patient, MatchParams, Entry } from "../types";
+import { Patient, MatchParams, Entry, Diagnosis } from "../types";
 import { apiBaseUrl } from "../constants";
-import { useStateValue, setPatient } from "../state";
+import { useStateValue, setPatient, setDiagnosisList } from "../state";
 import { useRouteMatch, useParams } from 'react-router-dom';
 
-const EntryHelper: React.FC<{ code: string }> = ({code}) => {
-  return (
-    <li>{code}</li>
-  )
-};
-
-const NoEntryHelper: React.FC = () => {
-  return (
-    <div>no entries for patient</div>
-  )
-};
-
 const IndividualPatientPage: React.FC = () => {
-  const [{ patients }, dispatch] = useStateValue();
+  const [{ patients, diagnoses }, dispatch] = useStateValue();
   const { id } = useParams<{ id: string }>();
 
   React.useEffect(() => {
@@ -36,6 +24,20 @@ const IndividualPatientPage: React.FC = () => {
     };
     fetchPatient();
   }, [dispatch, id]);
+
+  React.useEffect(() => {
+    const fetchDiagnosisList = async () => {
+      try {
+        const { data: diagnosisFromApi } = await axios.get<Diagnosis[]>(
+          `${apiBaseUrl}/api/diagnoses/`
+        );
+        dispatch(setDiagnosisList(diagnosisFromApi));
+      } catch (e) {
+        console.error(e.response.data);
+      }
+    };
+    fetchDiagnosisList();
+  }, [dispatch]);
 
   const match: MatchParams | null = useRouteMatch('/patients/:id');
   const patient: Patient | null | undefined = match
@@ -56,6 +58,26 @@ const IndividualPatientPage: React.FC = () => {
         <i className="genderless icon"></i>
       );
     }
+  };
+
+  const EntryHelper: React.FC<{ code: string }> = ({ code }) => {
+    return (
+      <li>
+        {code}
+        &nbsp;
+        {
+          Object.values(diagnoses)
+          .filter((diagnosis: Diagnosis) => diagnosis.code === code)
+          .map((diagnosis: Diagnosis) => diagnosis.name)
+        }
+      </li>
+    )
+  };
+  
+  const NoEntryHelper: React.FC = () => {
+    return (
+      <div>no entries for patient</div>
+    )
   };
 
   if (!patient) {
