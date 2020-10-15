@@ -2,10 +2,113 @@ import React from "react";
 import axios from "axios";
 import { Container } from "semantic-ui-react";
 
-import { Patient, MatchParams, Entry, Diagnosis } from "../types";
 import { apiBaseUrl } from "../constants";
 import { useStateValue, setPatient, setDiagnosisList } from "../state";
 import { useRouteMatch, useParams } from 'react-router-dom';
+import {
+  Patient,
+  MatchParams,
+  Entry,
+  Diagnosis 
+} from "../types";
+
+const NoEntryHelper: React.FC = () => {
+  return (
+    <div>no entries for patient</div>
+  )
+};
+
+const EntryHelper: React.FC<{ code: string, diagnoses: Diagnosis[] }> = ({ code, diagnoses }) => {
+  return (
+    <li>
+      {code}
+      &nbsp;
+      {
+        Object.values(diagnoses)
+        .filter((diagnosis: Diagnosis) => diagnosis.code === code)
+        .map((diagnosis: Diagnosis) => diagnosis.name)
+      }
+    </li>
+  )
+};
+
+const EntryDetails: React.FC<{ entry: Entry, diagnoses: Diagnosis[] }> = ({ entry, diagnoses }) => {
+  const assertNever = (value: never): never => {
+    throw new Error(
+      `Unhandled discriminated union member: ${JSON.stringify(value)}`
+    )
+  };
+
+  switch (entry.type) {
+    case "Hospital":
+      break;
+    case "OccupationalHealthcare":
+      break;
+    case "HealthCheck":
+      break;
+    default:
+      return assertNever(entry);
+  }
+
+  const entryTypeIcon = () => {
+    if (entry!.type === "Hospital") {
+      return (
+        <i className="hospital icon" style={{ fontSize: 30 }}></i>
+      );
+    } else if(entry!.type === "OccupationalHealthcare") {
+      return (
+        <i className="stethoscope icon" style={{ fontSize: 30 }}></i>
+      );
+    } else if(entry!.type === "HealthCheck") {
+      return (
+        <i className="doctor icon" style={{ fontSize: 30 }}></i>
+      );
+    }
+  };
+
+  const entryHeartIcon = () => {
+    if (entry!.type === "Hospital") {
+      return (
+        <i className="heart icon" style={{ fontSize: 25, color: 'yellow' }}></i>
+      );
+    } else if(entry!.type === "OccupationalHealthcare") {
+      return (
+        <i className="heart icon" style={{ fontSize: 25, color: 'blue' }}></i>
+      );
+    } else if(entry!.type === "HealthCheck") {
+      return (
+        <i className="heart icon" style={{ fontSize: 25, color: 'green' }}></i>
+      );
+    }
+  };
+
+  return (
+    <div key={entry.id} style={{ border: '1px solid', margin: 10, padding: 10, borderRadius: 10 }}>
+    {
+      entry.type === "OccupationalHealthcare"
+      ? <div><h3><b>{entry.date} {entryTypeIcon()} {entry.employerName}</b></h3></div>
+      : <div><h3><b>{entry.date} {entryTypeIcon()}</b></h3></div>
+    }
+    <div><i>{entry.description}</i></div>
+    <br></br>
+    <div>{entryHeartIcon()}</div>
+    <ul>
+      {
+        entry.diagnosisCodes === undefined
+        ? null
+        : entry.diagnosisCodes
+          .map((code: string) =>
+            <EntryHelper
+              key={code}
+              code={code}
+              diagnoses={Object.values(diagnoses)}
+            />  
+          )    
+      }
+    </ul>
+    </div>
+  );
+};
 
 const IndividualPatientPage: React.FC = () => {
   const [{ patients, diagnoses }, dispatch] = useStateValue();
@@ -60,26 +163,6 @@ const IndividualPatientPage: React.FC = () => {
     }
   };
 
-  const EntryHelper: React.FC<{ code: string }> = ({ code }) => {
-    return (
-      <li>
-        {code}
-        &nbsp;
-        {
-          Object.values(diagnoses)
-          .filter((diagnosis: Diagnosis) => diagnosis.code === code)
-          .map((diagnosis: Diagnosis) => diagnosis.name)
-        }
-      </li>
-    )
-  };
-  
-  const NoEntryHelper: React.FC = () => {
-    return (
-      <div>no entries for patient</div>
-    )
-  };
-
   if (!patient) {
     return null;
   } else {
@@ -94,22 +177,10 @@ const IndividualPatientPage: React.FC = () => {
             patient.entries === undefined || patient.entries.length === 0 
             ? <NoEntryHelper />
             : patient.entries.map((entry: Entry) => (
-              <div key={entry.id}>
-              <div>{entry.date} <i>{entry.description}</i></div>
-              <ul>
-                {
-                  entry.diagnosisCodes === undefined
-                  ? null
-                  : entry.diagnosisCodes
-                    .map((code: string) =>
-                      <EntryHelper
-                        key={code}
-                        code={code}
-                      />  
-                    )    
-                }
-              </ul>
-              </div>
+              <EntryDetails
+                entry={entry}
+                diagnoses={Object.values(diagnoses)}
+              />
           ))}
         </Container>
       </div>

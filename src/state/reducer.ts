@@ -4,11 +4,11 @@ import { Patient, Diagnosis } from "../types";
 export type Action =
   | {
       type: "SET_PATIENT_LIST";
-      payload: Patient [];
+      payload: Patient[];
     }
   | {
       type: "SET_DIAGNOSIS_LIST";
-      payload: Diagnosis [];
+      payload: Diagnosis[];
     }  
   | {
       type: "SET_PATIENT";
