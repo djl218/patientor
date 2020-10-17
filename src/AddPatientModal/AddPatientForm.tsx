@@ -31,6 +31,7 @@ export const AddPatientForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
       onSubmit={onSubmit}
       validate={values => {
         const requiredError = "Field is required";
+        const dateError = "Field needs to be a valid date";
         const errors: { [field: string]: string } = {};
         if (!values.name) {
           errors.name = requiredError;
@@ -40,6 +41,9 @@ export const AddPatientForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
         }
         if (!values.dateOfBirth) {
           errors.dateOfBirth = requiredError;
+        }
+        if (!(Boolean(Date.parse(values.dateOfBirth)))) {
+          errors.date = dateError;
         }
         if (!values.occupation) {
           errors.occupation = requiredError;

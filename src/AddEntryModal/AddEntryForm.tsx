@@ -37,7 +37,32 @@ const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
     }}
     onSubmit={onSubmit}
     validate={values => {
-      /// ...
+      const requiredError = "Field is required";
+      const dateError = "Field needs to be a valid date";
+      const errors: { [field: string]: string } = {};
+      const dischargeErrors: { discharge: { [field: string]: string }} = { discharge: {} };
+      if (!values.description) {
+        errors.description = requiredError;
+      }
+      if (!values.date) {
+        errors.date = requiredError;
+      }
+      if (!(Boolean(Date.parse(values.date)))) {
+        errors.date = dateError;
+      }
+      if (!values.specialist) {
+        errors.specialist = requiredError;
+      }
+      if (!values.discharge.date) {
+        dischargeErrors.discharge.date = requiredError;
+      }
+      if (!(Boolean(Date.parse(values.discharge.date)))) {
+        dischargeErrors.discharge.date = dateError;
+      }
+      if (!values.discharge.criteria) {
+        dischargeErrors.discharge.criteria = requiredError;
+      }
+      return { ...errors, ...dischargeErrors };
     }}
   >
     {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
