@@ -69,3 +69,11 @@ export type Entry =
   | HospitalEntry
   | OccupationalHealthcareEntry
   | HealthyCheckEntry;
+
+  /*export type NewHospitalEntry = Omit<HospitalEntry, 'id'>;
+
+  export type NewOccupationalHealthcareEntry = Omit<OccupationalHealthcareEntry, 'id'>;
+  
+  export type NewHealthyCheckEntry = Omit<HealthyCheckEntry, 'id'>;
+  
+  export type NewEntry = Omit<Entry, 'id'>;*/

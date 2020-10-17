@@ -11,7 +11,7 @@ import HealthRatingBar from "../components/HealthRatingBar";
 import { addPatient, useStateValue } from "../state";
 
 const PatientListPage: React.FC = () => {
-  const [{ patients }, patientDispatch] = useStateValue();
+  const [{ patients }, dispatch] = useStateValue();
 
   const [modalOpen, setModalOpen] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | undefined>();
@@ -29,7 +29,7 @@ const PatientListPage: React.FC = () => {
         `${apiBaseUrl}/api/patients`,
         values
       );
-      patientDispatch(addPatient(newPatient));
+      dispatch(addPatient(newPatient));
       closeModal();
     } catch (e) {
       console.error(e.response.data);

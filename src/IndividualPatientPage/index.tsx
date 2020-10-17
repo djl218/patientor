@@ -1,16 +1,17 @@
 import React from "react";
 import axios from "axios";
-import { Container } from "semantic-ui-react";
-
+import { Container, Button } from "semantic-ui-react";
 import { apiBaseUrl } from "../constants";
-import { useStateValue, setPatient, setDiagnosisList } from "../state";
+import { useStateValue, setPatient, setDiagnosisList, addEntry } from "../state";
 import { useRouteMatch, useParams } from 'react-router-dom';
 import {
   Patient,
   MatchParams,
   Entry,
-  Diagnosis 
+  Diagnosis
 } from "../types";
+import AddEntryModal from '../AddEntryModal'
+import { EntryFormValues } from "../AddEntryModal/AddEntryForm";
 
 const NoEntryHelper: React.FC = () => {
   return (
@@ -69,7 +70,7 @@ const EntryDetails: React.FC<{ entry: Entry, diagnoses: Diagnosis[] }> = ({ entr
   const entryHeartIcon = () => {
     if (entry!.type === "Hospital") {
       return (
-        <i className="heart icon" style={{ fontSize: 25, color: 'yellow' }}></i>
+        <i className="heart icon" style={{ fontSize: 25, color: 'orange' }}></i>
       );
     } else if(entry!.type === "OccupationalHealthcare") {
       return (
@@ -112,6 +113,30 @@ const EntryDetails: React.FC<{ entry: Entry, diagnoses: Diagnosis[] }> = ({ entr
 
 const IndividualPatientPage: React.FC = () => {
   const [{ patients, diagnoses }, dispatch] = useStateValue();
+  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string | undefined>();
+
+  const openModal = (): void => setModalOpen(true);
+
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setError(undefined);
+  };
+
+  const submitNewEntry = async (values: EntryFormValues) => {
+    try {
+      const { data: newEntry } = await axios.post<Patient>(
+        `${apiBaseUrl}/api/patients/${id}/entries`,
+        values
+      );
+      dispatch(addEntry(newEntry));
+      closeModal();
+    } catch (e) {
+      console.error(e.response.data);
+      setError(e.response.data.error);
+    }
+  };
+
   const { id } = useParams<{ id: string }>();
 
   React.useEffect(() => {
@@ -172,12 +197,20 @@ const IndividualPatientPage: React.FC = () => {
           <h2>{patient!.name}{genderIcon()}</h2>
           <div><b>ssn: {patient!.ssn}</b></div>
           <div><b>occupation: {patient!.occupation}</b></div>
+          <AddEntryModal
+          modalOpen={modalOpen}
+          onSubmit={submitNewEntry}
+          error={error}
+          onClose={closeModal}
+        />
+        <Button onClick={() => openModal()}>Add New Entry</Button>
           <h3>entries</h3>
           {
             patient.entries === undefined || patient.entries.length === 0 
             ? <NoEntryHelper />
             : patient.entries.map((entry: Entry) => (
               <EntryDetails
+                key={entry.id}
                 entry={entry}
                 diagnoses={Object.values(diagnoses)}
               />
