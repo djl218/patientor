@@ -1,22 +1,38 @@
 import React from 'react';
 import { Modal, Segment } from 'semantic-ui-react';
-import AddEntryForm, { EntryFormValues } from './AddEntryForm';
+import AddHospitalEntryForm, { HospitalEntryFormValues } from './AddHospitalEntryForm';
+import AddOccupationalEntryForm, { OccupationalEntryFormValues } from './AddOccupationalEntryForm';
 
-interface Props {
-  modalOpen: boolean;
+interface HospitalProps {
+  hospitalModalOpen: boolean;
   onClose: () => void;
-  onSubmit: (values: EntryFormValues) => void;
+  onHospitalSubmit: (values: HospitalEntryFormValues) => void;
   error?: string;
 }
 
-const AddEntryModal = ({ modalOpen, onClose, onSubmit, error }: Props) => (
-  <Modal open={modalOpen} onClose={onClose} centered={false} closeIcon>
-    <Modal.Header>Add a new entry</Modal.Header>
+interface OccupationalProps {
+  occupationalModalOpen: boolean;
+  onClose: () => void;
+  onOccupationalSubmit: (values: OccupationalEntryFormValues) => void;
+  error?: string;
+}
+
+export const AddHospitalEntryModal = ({ hospitalModalOpen, onClose, onHospitalSubmit, error }: HospitalProps) => (
+  <Modal open={hospitalModalOpen} onClose={onClose} centered={false} closeIcon>
+    <Modal.Header>Add a new hospital entry</Modal.Header>
     <Modal.Content>
       {error && <Segment inverted color="red">{`Error: ${error}`}</Segment>}
-      <AddEntryForm onSubmit={onSubmit} onCancel={onClose} />
+      <AddHospitalEntryForm onSubmit={onHospitalSubmit} onCancel={onClose} />
     </Modal.Content>
   </Modal>
 );
 
-export default AddEntryModal;
+export const AddOccupationalEntryModal = ({ occupationalModalOpen, onClose, onOccupationalSubmit, error }: OccupationalProps) => (
+  <Modal open={occupationalModalOpen} onClose={onClose} centered={false} closeIcon>
+    <Modal.Header>Add a new occupational healthcare entry</Modal.Header>
+    <Modal.Content>
+      {error && <Segment inverted color="red">{`Error: ${error}`}</Segment>}
+      <AddOccupationalEntryForm onSubmit={onOccupationalSubmit} onCancel={onClose} />
+    </Modal.Content>
+  </Modal>
+);

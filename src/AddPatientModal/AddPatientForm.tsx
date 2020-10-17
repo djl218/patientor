@@ -43,7 +43,7 @@ export const AddPatientForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
           errors.dateOfBirth = requiredError;
         }
         if (!(Boolean(Date.parse(values.dateOfBirth)))) {
-          errors.date = dateError;
+          errors.dateOfBirth = dateError;
         }
         if (!values.occupation) {
           errors.occupation = requiredError;
