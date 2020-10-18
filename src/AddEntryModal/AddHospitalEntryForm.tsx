@@ -2,8 +2,8 @@ import React from "react";
 import { Grid, Button } from "semantic-ui-react";
 import { Field, Formik, Form } from "formik";
 
-import { TextField, DiagnosisSelection, /*HealthCheckRatingOption*/ } from "./EntryField";
-import { /*HealthCheckRating , */HospitalEntry } from "../types";
+import { TextField, DiagnosisSelection } from "./EntryField";
+import { HospitalEntry } from "../types";
 import { useStateValue } from "../state";
 
 export type HospitalEntryFormValues = Omit<HospitalEntry, "id">;
@@ -13,15 +13,8 @@ interface Props {
   onCancel: () => void;
 }
 
-/*const HealthCheckRatingOptions: HealthCheckRatingOption[] = [
-  { value: HealthCheckRating.Healthy, label: "Healthy" },
-  { value: HealthCheckRating.LowRisk, label: "Low Risk" },
-  { value: HealthCheckRating.HighRisk, label: "High Risk" },
-  { value: HealthCheckRating.CriticalRisk, label: "Critical Risk" }
-];*/
-
 const AddHospitalEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
-  const [{ diagnoses }] = useStateValue()
+  const [{ diagnoses }] = useStateValue();
 
   return (
     <Formik
@@ -39,8 +32,15 @@ const AddHospitalEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
       validate={values => {
         const requiredError = "Field is required";
         const dateError = "Field needs to be a valid date";
-        const errors: { [field: string]: string } = {};
-        const dischargeErrors: { discharge: { [field: string]: string }} = { discharge: {} };
+        const errors: {
+          description?: string;
+          date?: string;
+          specialist?: string;
+          discharge?: {
+            date?: string;
+            criteria?: string;
+          };
+        } = {};
         if (!values.description) {
           errors.description = requiredError;
         }
@@ -54,15 +54,15 @@ const AddHospitalEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
           errors.specialist = requiredError;
         }
         if (!values.discharge.date) {
-          dischargeErrors.discharge.date = requiredError;
+          errors.discharge = { ...errors.discharge, date: requiredError };
         }
         if (!(Boolean(Date.parse(values.discharge.date)))) {
-          dischargeErrors.discharge.date = dateError;
+          errors.discharge = { ...errors.discharge, date: dateError };
         }
         if (!values.discharge.criteria) {
-          dischargeErrors.discharge.criteria = requiredError;
+          errors.discharge = { ...errors.discharge, criteria: requiredError };
         }
-        return { ...errors, ...dischargeErrors };
+        return errors;
       }}
     >
       {({ isValid, dirty, setFieldValue, setFieldTouched }) => {

@@ -10,9 +10,10 @@ import {
   Entry,
   Diagnosis
 } from "../types";
-import { AddHospitalEntryModal, AddOccupationalEntryModal } from '../AddEntryModal'
+import { AddHospitalEntryModal, AddOccupationalEntryModal, AddHealthyCheckEntryModal } from '../AddEntryModal'
 import { HospitalEntryFormValues } from "../AddEntryModal/AddHospitalEntryForm";
 import { OccupationalEntryFormValues } from "../AddEntryModal/AddOccupationalEntryForm";
+import { HealthyCheckEntryFormValues } from "../AddEntryModal/AddHealthyCheckEntryForm";
 
 const NoEntryHelper: React.FC = () => {
   return (
@@ -117,11 +118,13 @@ const IndividualPatientPage: React.FC = () => {
 
   const [hospitalModalOpen, setHospitalModalOpen] = React.useState<boolean>(false);
   const [occupationalModalOpen, setOccupationalModalOpen] = React.useState<boolean>(false);
+  const [healthyCheckModalOpen, setHealthyCheckModalOpen] = React.useState<boolean>(false);
 
   const [error, setError] = React.useState<string | undefined>();
 
   const openHospitalModal = (): void => setHospitalModalOpen(true);
   const openOccupationalModal = (): void => setOccupationalModalOpen(true);
+  const openHealthyCheckModal = (): void => setHealthyCheckModalOpen(true);
 
   const closeHospitalModal = (): void => {
     setHospitalModalOpen(false);
@@ -129,6 +132,10 @@ const IndividualPatientPage: React.FC = () => {
   };
   const closeOccupationalModal = (): void => {
     setOccupationalModalOpen(false);
+    setError(undefined);
+  };
+  const closeHealthyCheckModal = (): void => {
+    setHealthyCheckModalOpen(false);
     setError(undefined);
   };
 
@@ -156,6 +163,20 @@ const IndividualPatientPage: React.FC = () => {
       );
       dispatch(addEntry(newEntry));
       closeOccupationalModal();
+    } catch (e) {
+      console.error(e.response.data);
+      setError(e.response.data.error);
+    }
+  };
+
+  const submitNewHealthyCheckEntry = async (values: HealthyCheckEntryFormValues) => {
+    try {
+      const { data: newEntry } = await axios.post<Patient>(
+        `${apiBaseUrl}/api/patients/${id}/entries`,
+        values
+      );
+      dispatch(addEntry(newEntry));
+      closeHealthyCheckModal();
     } catch (e) {
       console.error(e.response.data);
       setError(e.response.data.error);
@@ -232,8 +253,15 @@ const IndividualPatientPage: React.FC = () => {
             error={error}
             onClose={closeOccupationalModal}
           />
+          <AddHealthyCheckEntryModal
+            healthyCheckModalOpen={healthyCheckModalOpen}
+            onHealthyCheckSubmit={submitNewHealthyCheckEntry}
+            error={error}
+            onClose={closeHealthyCheckModal}
+          />
           <Button onClick={() => openHospitalModal()}>Add New Hospital Entry</Button>
           <Button onClick={() => openOccupationalModal()}>Add New Occupational Healthcare Entry</Button>
+          <Button onClick={() => openHealthyCheckModal()}>Add New Healthy Check Entry</Button>
           <h3>entries</h3>
           {
             patient.entries === undefined || patient.entries.length === 0 

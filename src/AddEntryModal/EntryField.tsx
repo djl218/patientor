@@ -1,22 +1,11 @@
 import React from "react";
 import { ErrorMessage, Field, FieldProps, FormikProps } from "formik";
 import { Dropdown, DropdownProps, Form } from "semantic-ui-react";
-import { Diagnosis, HealthCheckRating } from "../types";
+import { Diagnosis } from "../types";
 
 export type TypeOption = {
   value: "Hospital" | "OccupationalHealthcare" | "HealthCheck";
   label: string;
-};
-
-export type HealthCheckRatingOption = {
-  value: HealthCheckRating;
-  label: string;
-};
-
-type SelectHealthCheckFieldProps = {
-  name: string;
-  label: string;
-  healthCheckRatingOptions: HealthCheckRatingOption[];
 };
 
 type SelectTypeFieldProps = {
@@ -24,23 +13,6 @@ type SelectTypeFieldProps = {
   label: string;
   typeOptions: TypeOption[];
 };
-
-export const SelectHealthCheckField: React.FC<SelectHealthCheckFieldProps> = ({
-  name,
-  label,
-  healthCheckRatingOptions
-}: SelectHealthCheckFieldProps) => (
-  <Form.Field>
-    <label>{label}</label>
-    <Field as="select" name={name} className="ui dropdown">
-      {healthCheckRatingOptions.map(option => (
-        <option key={option.value} value={option.value}>
-          {option.label || option.value}
-        </option>
-      ))}
-    </Field>
-  </Form.Field>
-);
 
 export const SelectTypeField: React.FC<SelectTypeFieldProps> = ({
   name,
